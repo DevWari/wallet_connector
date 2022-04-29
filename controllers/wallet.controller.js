@@ -53,11 +53,11 @@ const getTransactions = async (address='0xa79E63e78Eec28741e711f89A672A4C40876Eb
     return transactionData.data.data?.items
 }
 
-const getERC20Transactions = async (address='0xa79E63e78Eec28741e711f89A672A4C40876Ebf3', channel = 1) => {
+const getERC20Transactions = async (address='0xa79E63e78Eec28741e711f89A672A4C40876Ebf3', channel = 1, contractAddress='0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48') => {
 
     let transactionData = null    
     try {
-        transactionData= await axios.get(`${COVAL_URL}/${channel}/address/${address}/transfers_v2/?contract-address=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&key=${COVAL_API_KEY}`)      
+        transactionData= await axios.get(`${COVAL_URL}/${channel}/address/${address}/transfers_v2/?contract-address=${contractAddress}&key=${COVAL_API_KEY}`)      
     } catch (e) {        
         return null
     }    
@@ -101,13 +101,16 @@ exports.getWalletInfo = async function (req, res, next) {
 
     const address = req.query.address
     const channel = req.query.channel     
+    const contracAddress = req.query.contractAddress     
 
     try {
         const balance = await getBalance (address);  
         const positions = await getPositions (address, channel)            
         const transactionData = await getTransactions (address, channel)       
-        const usd_rate = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')  
-        const ERC20transactions = await getERC20Transactions (wallet, channel) 
+        let ERC20transactions = null;
+        const usd_rate = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')          
+        if (contracAddress) await getERC20Transactions (wallet, channel, contracAddress) 
+        else await getERC20Transactions (wallet, channel) 
         if (balance && positions && transactionData) {
             const response = {
                 balance: balance,
@@ -120,7 +123,7 @@ exports.getWalletInfo = async function (req, res, next) {
             return res.send (response)   
         } else {
             return res.status(500).send({ error: 'error' })
-        }      
+        }
 
     } catch (e) {
         console.log (e)
