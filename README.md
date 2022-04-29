@@ -8,9 +8,14 @@
 
      - address: wallet address
      - channel: channel id (for example: channel id of mainnet is 1 )
-     - http://localhost:3000/api/get-wallet-info?address=0xa79E63e78Eec28741e711f89A672A4C40876Ebf3&channel=1
+     - Example
+
+          - http://localhost:3000/api/get-wallet-info?address=0xa79E63e78Eec28741e711f89A672A4C40876Ebf3&channel=1
 
 # test
 
- - node index.js --wallet=[address] (0xa79E63e78Eec28741e711f89A672A4C40876Ebf3)
+ - node index.js --wallet=[address]
+ - Example
+
+     - node index.js --wallet=0xa79E63e78Eec28741e711f89A672A4C40876Ebf3
 
