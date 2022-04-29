@@ -53,28 +53,34 @@ const getTransactions = async (address='0xa79E63e78Eec28741e711f89A672A4C40876Eb
     return transactionData.data.data?.items
 }
 
+const getERC20Transactions = async (address='0xa79E63e78Eec28741e711f89A672A4C40876Ebf3', channel = 1) => {
+
+    let transactionData = null    
+    try {
+        transactionData= await axios.get(`${COVAL_URL}/${channel}/address/${address}/transfers_v2/?contract-address=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&key=${COVAL_API_KEY}`)      
+    } catch (e) {        
+        return null
+    }    
+    return transactionData.data.data?.items
+}
+
 const testScript = async () => {
     if (!wallet) return;    
-    const channel = 1
-    
-    let balance = null;
-    let positions = [];           
-    let transactionData = null;
-    
-    balance = await getBalance (wallet)
-    positions = await getPositions (wallet, channel)        
-    transactionData = await getTransactions (wallet, channel) 
-    
+    const channel = 1  
     try {
-
+        const balance = await getBalance (wallet)
+        const positions = await getPositions (wallet, channel)        
+        const transactionData = await getTransactions (wallet, channel) 
         const usd_rate = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')   
+        const ERC20transactions = await getERC20Transactions (wallet, channel) 
         if (balance && positions && transactionData) {
             const response = {
                 balance: balance,
                 usd_rate: usd_rate.data.ethereum.usd,
                 usd_balance: balance * usd_rate.data.ethereum.usd,
                 positions: positions,
-                transactions: transactionData
+                transactions: transactionData,
+                ERC20transactions: ERC20transactions
             }    
             console.log ("response.....", response)     
         } else {
@@ -101,13 +107,15 @@ exports.getWalletInfo = async function (req, res, next) {
         const positions = await getPositions (address, channel)            
         const transactionData = await getTransactions (address, channel)       
         const usd_rate = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')  
+        const ERC20transactions = await getERC20Transactions (wallet, channel) 
         if (balance && positions && transactionData) {
             const response = {
                 balance: balance,
                 usd_rate: usd_rate.data.ethereum.usd,
                 usd_balance: balance * usd_rate.data.ethereum.usd,
                 positions: positions,
-                transactions: transactionData
+                transactions: transactionData,
+                ERC20transactions: ERC20transactions
             }    
             return res.send (response)   
         } else {
