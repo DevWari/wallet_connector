@@ -1,7 +1,7 @@
 # install & run
 - Go to root folder of project and try this command
-     npm install
-- node index.js
+   - npm install
+   - node index.js
 - After run server, open your browser and go to this url
   - http://localhost:3000/api/get-wallet-info
   - You can pass input parameters
